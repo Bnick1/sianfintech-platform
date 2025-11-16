@@ -23,6 +23,9 @@ const KioskAIportal = () => {
   const [assessmentType, setAssessmentType] = useState('');
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
 
+  // Your live backend URL
+  const API_BASE_URL = 'https://sianfintech-platform-production.up.railway.app';
+
   // Options with translation keys
   const occupationOptions = [
     { value: 'market_vendor', labelKey: 'market_vendor', icon: '🛒' },
@@ -96,7 +99,7 @@ const KioskAIportal = () => {
           assessmentType: 'farmer'
         };
 
-        response = await fetch('http://localhost:8082/api/ai/farmer-assessment', {
+        response = await fetch(`${API_BASE_URL}/api/ai/farmer-assessment`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(assessmentData)
@@ -109,7 +112,7 @@ const KioskAIportal = () => {
           assessmentType: 'regular'
         };
 
-        response = await fetch('http://localhost:8082/api/ai/credit-assessment', {
+        response = await fetch(`${API_BASE_URL}/api/ai/credit-assessment`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(assessmentData)
