@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #f9fafb;
+  line-height: 1.6;
+  color: #374151;
+}
+
+/* Custom component classes */
+.btn-primary {
+  @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-3 px-6 rounded-lg transition-colors duration-200 border border-gray-300;
+}
+
+.btn-accent {
+  @apply bg-accent-500 hover:bg-accent-600 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md;
+}
+
+.card {
+  @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200;
+}
+
+.card-gradient {
+  @apply bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-xl shadow-lg p-6;
+}
+
+.nav-link {
+  @apply text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200 px-3 py-2 rounded-lg;
+}
+
+.nav-link.active {
+  @apply text-primary-600 bg-primary-50 font-semibold;
+}
+
+.logo-text {
+  background: linear-gradient(135deg, #0c8cef 0%, #006fcd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+/* Dashboard Specific Styles */
+.dashboard {
+  @apply p-6 max-w-7xl mx-auto;
+}
+
+.metrics-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8;
+}
+
+.metric-card {
+  @apply card hover:shadow-lg transition-all duration-300 fade-in;
+}
+
+.metric-value {
+  @apply text-3xl font-bold text-gray-900 mb-2;
+}
+
+.metric-change {
+  @apply text-green-600 text-sm font-medium;
+}
+
+.quick-actions-section {
+  @apply mt-8 fade-in;
+}
+
+.quick-actions-section h2 {
+  @apply text-2xl font-bold text-gray-900 mb-6;
+}
+
+.quick-actions-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6;
+}
+
+.action-card {
+  @apply card cursor-pointer hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-200 hover:border-primary-300 text-center;
+}
+
+.action-icon {
+  @apply text-4xl mb-4;
+}
+
+.action-card h3 {
+  @apply text-lg font-semibold text-gray-900 mb-2;
+}
+
+.action-card p {
+  @apply text-sm text-gray-600 leading-relaxed;
+}
+
+/* Utility classes */
+.text-gradient {
+  background: linear-gradient(135deg, #0c8cef 0%, #006fcd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.border-gradient {
+  border-image: linear-gradient(135deg, #0c8cef 0%, #006fcd 100%) 1;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0c8cef;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #006fcd;
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}

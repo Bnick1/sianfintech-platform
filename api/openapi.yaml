@@ -1,0 +1,31 @@
+openapi: 3.0.3
+info:
+  title: SianFinTech Platform API
+  version: 1.0.0
+  description: API specification for SianFinTech multi-tenant platform integrating loans, AI, payments, and kiosk systems.
+servers:
+  - url: https://api.sianfintech.com/v1
+    description: Production server
+  - url: https://staging.api.sianfintech.com/v1
+    description: Staging server
+tags: []
+
+paths:
+  /hello:
+    get:
+      summary: Simple hello endpoint
+      responses:
+        '200':
+          description: Returns a hello message
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  schemas:
+    ExampleSchema:
+      type: object
+      properties:
+        message:
+          type: string

@@ -1,0 +1,412 @@
+openapi: 3.0.3
+info:
+  title: SianFinTech Platform API
+  version: "1.0.0"
+  description: API specification for SianFinTech multi-tenant platform integrating loans, AI, payments, kiosks, and MicroInvest.
+servers:
+  - url: https://api.sianfintech.com/v1
+    description: Production server
+  - url: https://staging.api.sianfintech.com/v1
+    description: Staging server
+
+tags:
+  - name: Hello
+    description: Test endpoint
+  - name: Users
+  - name: Loans
+  - name: Payments
+  - name: Kiosks
+  - name: AI
+  - name: Investments
+
+paths:
+  /hello:
+    get:
+      tags:
+        - Hello
+      summary: Simple hello endpoint
+      responses:
+        '200':
+          description: Returns a hello message
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /users/register:
+    post:
+      tags:
+        - Users
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /loans/apply:
+    post:
+      tags:
+        - Loans
+      summary: Apply for a loan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Loan'
+      responses:
+        '201':
+          description: Loan application created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+
+  /loans/{loanId}:
+    get:
+      tags:
+        - Loans
+      summary: Get loan by ID
+      parameters:
+        - name: loanId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Loan object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Loan'
+
+  /payments:
+    post:
+      tags:
+        - Payments
+      summary: Make a payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      responses:
+        '201':
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+  /payments/{paymentId}:
+    get:
+      tags:
+        - Payments
+      summary: Get payment by ID
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payment object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+  /kiosks/{kioskId}/status:
+    get:
+      tags:
+        - Kiosks
+      summary: Get kiosk status
+      parameters:
+        - name: kioskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Kiosk status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Kiosk'
+
+  /ai/predict:
+    post:
+      tags:
+        - AI
+      summary: Predict client default probability
+      operationId: aiPredictDefaultPOST
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input:
+                  type: string
+                  example: "Sample input for AI model"
+      responses:
+        '200':
+          description: Successful AI prediction
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  prediction:
+                    type: string
+
+  /investments:
+    post:
+      tags:
+        - Investments
+      summary: Make a micro-investment in an instrument
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestmentRequest'
+      responses:
+        '201':
+          description: Investment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestmentResponse'
+
+  /investments/small-scale:
+    post:
+      tags:
+        - Investments
+      summary: Create a small-scale investment (citizens, hard-to-reach areas)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmallScaleInvestmentRequest'
+      responses:
+        '201':
+          description: Small-scale investment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestmentResponse'
+
+  /investments/{investmentId}:
+    get:
+      tags:
+        - Investments
+      summary: Get investment by ID
+      parameters:
+        - name: investmentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Investment object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Investment'
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - name
+        - email
+        - phone
+      properties:
+        id:
+          type: string
+          example: "1001"
+        name:
+          type: string
+          example: "Alice Johnson"
+        email:
+          type: string
+          example: "alice@example.com"
+        phone:
+          type: string
+          example: "+256700123456"
+
+    Loan:
+      type: object
+      required:
+        - id
+        - userId
+        - amount
+        - status
+        - termMonths
+      properties:
+        id:
+          type: string
+          example: "2001"
+        userId:
+          type: string
+          example: "1001"
+        amount:
+          type: number
+          example: 5000
+        status:
+          type: string
+          example: "Approved"
+        termMonths:
+          type: integer
+          example: 6
+
+    Payment:
+      type: object
+      required:
+        - id
+        - loanId
+        - amount
+        - date
+      properties:
+        id:
+          type: string
+          example: "3001"
+        loanId:
+          type: string
+          example: "2001"
+        amount:
+          type: number
+          example: 5000
+        date:
+          type: string
+          format: date-time
+          example: "2025-10-24T12:00:00Z"
+
+    Kiosk:
+      type: object
+      required:
+        - kioskId
+        - status
+      properties:
+        kioskId:
+          type: string
+          example: "4001"
+        status:
+          type: string
+          example: "Online"
+
+    InvestmentRequest:
+      type: object
+      required:
+        - productType
+        - amount
+        - walletId
+      properties:
+        productType:
+          type: string
+          description: Type of product (bond, treasury_bill, unit_trust)
+          example: "unit_trust"
+        amount:
+          type: number
+          description: Amount in local currency (e.g., UGX)
+          example: 1000
+        walletId:
+          type: string
+          description: Wallet identifier
+          example: "wallet-1001"
+
+    SmallScaleInvestmentRequest:
+      type: object
+      required:
+        - productType
+        - amount
+        - walletId
+        - citizenId
+      properties:
+        productType:
+          type: string
+          description: Type of product (bond, treasury_bill, unit_trust)
+          example: "unit_trust"
+        amount:
+          type: number
+          description: Amount in local currency (UGX)
+          example: 500
+        walletId:
+          type: string
+          description: Wallet identifier
+          example: "wallet-2002"
+        citizenId:
+          type: string
+          description: Citizen identifier
+          example: "citizen-001"
+
+    InvestmentResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        status:
+          type: string
+          example: "completed"
+        investment:
+          $ref: '#/components/schemas/Investment'
+
+    Investment:
+      type: object
+      properties:
+        id:
+          type: string
+        productType:
+          type: string
+        amount:
+          type: number
+        walletId:
+          type: string
+        citizenId:
+          type: string
+        type:
+          type: string
+          example: "small-scale"
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
