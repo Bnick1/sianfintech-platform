@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://sianfintech-backend-nv1u9b3rl-nicksons-projects-09235225.vercel.app'; // Your actual backend URL
+const API_BASE_URL = 'https://sianfintech-backend.vercel.app'; // Your actual backend URL
 
 const api = axios.create({
   baseURL: API_BASE_URL,
