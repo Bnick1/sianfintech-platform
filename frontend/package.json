@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@tanstack/react-query": "^5.90.10",
     "axios": "^1.13.2",
     "react": "^18.2.0",
@@ -19,13 +18,5 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
     "vite": "^4.4.0"
-=======
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "vite": "^4.4.0",
-    "@vitejs/plugin-react": "^4.0.0"
->>>>>>> c9328b32a5db431594c7ffb72459d6504ceafc66
   }
 }
