@@ -1,30 +1,385 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SianFinTech Platform - Empowering Uganda's Informal Economy</title>
-    <meta name="description" content="AI-driven financial inclusion platform serving market vendors, artisans, farmers, and youth entrepreneurs across Uganda">
-    
-    <!-- Preload fonts for better performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Open Graph meta tags for social sharing -->
-    <meta property="og:title" content="SianFinTech Platform">
-    <meta property="og:description" content="AI-driven financial inclusion for Uganda's informal economy">
-    <meta property="og:type" content="website">
-    
-    <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <script type="module" crossorigin src="/assets/index-4eacb4e3.js"></script>
-    <link rel="stylesheet" href="/assets/index-31e72415.css">
-  </head>
-  <body>
-    <div id="root"></div>
-    
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SianFinTech - Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #1a3a5f;
+            --secondary-color: #2c5aa0;
+            --accent-color: #4a90e2;
+            --light-color: #f5f7fa;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --text-color: #333;
+            --light-text: #fff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .logo span {
+            color: var(--accent-color);
+        }
+        
+        .nav-links {
+            list-style: none;
+        }
+        
+        .nav-links li {
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links li:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .nav-links li.active {
+            background-color: var(--secondary-color);
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .nav-links a {
+            color: var(--light-text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-links i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="10" fill="rgba(74,144,226,0.03)">Sian</text></svg>');
+            background-repeat: repeat;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .header h2 {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .positive {
+            color: var(--success-color);
+        }
+        
+        .negative {
+            color: var(--danger-color);
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            margin-bottom: 30px;
+        }
+        
+        .quick-actions h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-btn {
+            background-color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .action-btn i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        /* Kiosk Management */
+        .kiosk-management {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .kiosk-management h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .kiosk-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .kiosk-count {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .kiosk-change {
+            color: var(--success-color);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar .logo h1, .sidebar .nav-links li span {
+                display: none;
+            }
+            
+            .sidebar .nav-links li {
+                text-align: center;
+                padding: 15px 0;
+            }
+            
+            .sidebar .nav-links li i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>Sian<span>FinTech</span></h1>
+            </div>
+            <ul class="nav-links">
+                <li class="active"><a href="#"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+                <li><a href="#"><i class="fas fa-users"></i> <span>Clients</span></a></li>
+                <li><a href="#"><i class="fas fa-hand-holding-usd"></i> <span>Loans</span></a></li>
+                <li><a href="#"><i class="fas fa-chart-line"></i> <span>Investments</span></a></li>
+                <li><a href="#"><i class="fas fa-store"></i> <span>Kiosks</span></a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                <li><a href="#"><i class="fas fa-question-circle"></i> <span>Help</span></a></li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h2>Dashboard Overview</h2>
+                <div class="user-info">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=2c5aa0&color=fff" alt="User">
+                    <span>Admin User</span>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Total Clients</h3>
+                    <div class="stat-value">1,247</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> +12% from last month
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Active Loans</h3>
+                    <div class="stat-value">UGX 856M</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> +8% from last month
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Investments</h3>
+                    <div class="stat-value">UGX 1.2B</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-down"></i> -15% from last month
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Kiosks Active</h3>
+                    <div class="stat-value">48</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> +3 from last month
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3>Quick Actions</h3>
+                <div class="action-buttons">
+                    <button class="action-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Register Client
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-robot"></i>
+                        AI Assessment
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        Loan Application
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-chart-pie"></i>
+                        Investments
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Kiosk Management -->
+            <div class="kiosk-management">
+                <h3>Kiosk Management</h3>
+                <div class="kiosk-stats">
+                    <div class="kiosk-count">48 Active Kiosks</div>
+                    <div class="kiosk-change">+3 from last month</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to handle active navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-links li');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    navLinks.forEach(item => item.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
 </html>

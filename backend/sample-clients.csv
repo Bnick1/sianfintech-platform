@@ -1,0 +1,5 @@
+client_id,client_name,national_id,phone_number,email,address,occupation,loan_balance,total_borrowed,total_repaid
+GLD001,John Omondi,CM92748363P,+256712345678,john@email.com,Kampala Central,Farmer,500000,1500000,1200000
+GLD002,Mary Nakato,CF62849172Q,+256773456789,mary@email.com,Entebbe Road,Market Vendor,250000,800000,600000
+GLD003,Peter Musoke,CM73928574R,+256704567890,,Jinja Town,Taxi Driver,750000,2000000,1500000
+GLD004,Sarah Nalwoga,CF82537485S,+256785678901,sarah@email.com,Masaka,Shop Owner,0,500000,500000

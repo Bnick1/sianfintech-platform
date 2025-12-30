@@ -1,22 +1,120 @@
+// src/pages/AIportal.jsx
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const AIportal = () => {
-  const [occupation, setOccupation] = useState('');
+  const [selectedClient, setSelectedClient] = useState('');
+  const [clients, setClients] = useState([]);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchHistory, setSearchHistory] = useState([]);
+  const [clientDetails, setClientDetails] = useState(null);
+  const [assessmentType, setAssessmentType] = useState('comprehensive');
 
-  // Common occupations for suggestions
-  const commonOccupations = [
-    'market_vendor', 'farmer', 'tailor', 'teacher', 'driver', 
-    'nurse', 'shop_keeper', 'mechanic', 'carpenter', 'electrician',
-    'fisherman', 'business_owner', 'accountant', 'software_developer',
-    'construction_worker', 'restaurant_owner', 'hotel_staff', 'security_guard'
+  // Enhanced mock client data matching the new registration structure
+  const mockClients = [
+    { 
+      id: 'CL001', 
+      name: 'Sarah Kamya', 
+      customerType: 'market_vendor',
+      occupationProfile: {
+        primaryOccupation: 'Fresh Produce Vendor',
+        yearsInOccupation: 3,
+        sectorSpecific: {
+          businessAge: 3,
+          monthlyRevenue: 1200000,
+          marketLocation: 'Kampala Market'
+        }
+      },
+      financialProfile: {
+        averageMonthlyIncome: 850000,
+        mobileMoneyUsage: {
+          primaryProvider: 'mtn',
+          averageBalance: 250000,
+          transactionFrequency: 'daily'
+        }
+      },
+      locationContext: {
+        region: 'Central',
+        district: 'Kampala'
+      }
+    },
+    { 
+      id: 'CL002', 
+      name: 'James Okello', 
+      customerType: 'farmer',
+      occupationProfile: {
+        primaryOccupation: 'Crop Farmer',
+        yearsInOccupation: 8,
+        sectorSpecific: {
+          cropType: 'Maize',
+          farmSize: 5,
+          farmingExperience: 8,
+          landOwnership: 'owned'
+        }
+      },
+      financialProfile: {
+        averageMonthlyIncome: 750000,
+        mobileMoneyUsage: {
+          primaryProvider: 'airtel',
+          averageBalance: 180000,
+          transactionFrequency: 'weekly'
+        }
+      },
+      locationContext: {
+        region: 'Eastern',
+        district: 'Jinja'
+      }
+    },
+    { 
+      id: 'CL003', 
+      name: 'Grace Nakato', 
+      customerType: 'artisan',
+      occupationProfile: {
+        primaryOccupation: 'Tailor',
+        yearsInOccupation: 2,
+        sectorSpecific: {
+          businessAge: 2,
+          monthlyRevenue: 650000
+        }
+      },
+      financialProfile: {
+        averageMonthlyIncome: 550000,
+        mobileMoneyUsage: {
+          primaryProvider: 'mtn',
+          averageBalance: 120000,
+          transactionFrequency: 'daily'
+        }
+      }
+    },
+    { 
+      id: 'CL004', 
+      name: 'David Ssemwanga', 
+      customerType: 'taxi_driver',
+      occupationProfile: {
+        primaryOccupation: 'Boda Boda Rider',
+        yearsInOccupation: 1,
+        sectorSpecific: {
+          gigPlatform: 'Bodaboda',
+          monthlyRevenue: 550000
+        }
+      },
+      financialProfile: {
+        averageMonthlyIncome: 480000,
+        mobileMoneyUsage: {
+          primaryProvider: 'mtn',
+          averageBalance: 80000,
+          transactionFrequency: 'daily'
+        }
+      }
+    }
   ];
 
-  // Load search history from localStorage
+  // Load clients and search history
   useEffect(() => {
+    setClients(mockClients);
+    
     const savedHistory = localStorage.getItem('aiAssessmentHistory');
     if (savedHistory) {
       setSearchHistory(JSON.parse(savedHistory));
@@ -24,22 +122,31 @@ const AIportal = () => {
   }, []);
 
   // Save to search history
-  const saveToHistory = (occupation, result) => {
+  const saveToHistory = (client, result) => {
     const newEntry = {
-      occupation,
+      clientId: client.id,
+      clientName: client.name,
       result,
       timestamp: new Date().toISOString(),
       id: Date.now()
     };
     
-    const updatedHistory = [newEntry, ...searchHistory.slice(0, 4)]; // Keep last 5
+    const updatedHistory = [newEntry, ...searchHistory.slice(0, 4)];
     setSearchHistory(updatedHistory);
     localStorage.setItem('aiAssessmentHistory', JSON.stringify(updatedHistory));
   };
 
+  const handleClientSelect = (clientId) => {
+    setSelectedClient(clientId);
+    const client = clients.find(c => c.id === clientId);
+    setClientDetails(client);
+    setResult(null);
+    setError(null);
+  };
+
   const handleAIAssessment = async () => {
-    if (!occupation.trim()) {
-      setError('Please enter an occupation');
+    if (!selectedClient) {
+      setError('Please select a client from the system');
       return;
     }
 
@@ -48,129 +155,260 @@ const AIportal = () => {
     setResult(null);
 
     try {
-      // Try real API first, fallback to mock data
-      const response = await fetch('http://localhost:8082/api/ai/credit-assessment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ occupation: occupation.trim().toLowerCase() }),
-      });
-
-      let assessmentResult;
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      if (response.ok) {
-        assessmentResult = await response.json();
-        assessmentResult.isMock = false;
-      } else {
-        // Fallback to mock data if API not available
-        throw new Error('API not available, using demo data');
-      }
+      const client = clients.find(c => c.id === selectedClient);
+      
+      // Enhanced AI assessment using comprehensive client data
+      const assessmentResult = generateEnhancedAssessment(client);
 
       setResult(assessmentResult);
-      saveToHistory(occupation, assessmentResult);
+      saveToHistory(client, assessmentResult);
       
     } catch (error) {
-      console.log('Using mock data:', error.message);
-      
-      // Enhanced mock data with occupation-based logic
-      const mockResults = generateMockAssessment(occupation);
-      mockResults.isMock = true;
-      
-      setResult(mockResults);
-      saveToHistory(occupation, mockResults);
-      setError('Demo data shown - API integration in progress');
+      console.error('Assessment error:', error);
+      setError('Assessment failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Smart mock data generation based on occupation
-  const generateMockAssessment = (occupation) => {
-    const occupationLower = occupation.toLowerCase();
+  // Enhanced assessment algorithm using new data structure
+  const generateEnhancedAssessment = (client) => {
+    const { customerType, occupationProfile, financialProfile, socialCapital, locationContext } = client;
     
-    // Base scores based on occupation type
-    let baseRisk = 50;
-    let baseLimit = 1000000;
+    // Base scoring system
+    let creditScore = 500; // Starting score
     
-    if (occupationLower.includes('vendor') || occupationLower.includes('market')) {
-      baseRisk = 35;
-      baseLimit = 2500000;
-    } else if (occupationLower.includes('farmer') || occupationLower.includes('fisher')) {
-      baseRisk = 45;
-      baseLimit = 1500000;
-    } else if (occupationLower.includes('teacher') || occupationLower.includes('nurse')) {
-      baseRisk = 25;
-      baseLimit = 3500000;
-    } else if (occupationLower.includes('developer') || occupationLower.includes('accountant')) {
-      baseRisk = 20;
-      baseLimit = 5000000;
-    } else if (occupationLower.includes('driver') || occupationLower.includes('security')) {
-      baseRisk = 55;
-      baseLimit = 800000;
-    }
-
-    // Add some randomness but keep it realistic
-    const riskScore = Math.max(5, Math.min(95, baseRisk + (Math.random() * 30 - 15)));
-    const confidence = 85 + (Math.random() * 10);
-    const suggestedLimit = baseLimit + Math.floor(Math.random() * 2000000);
-
-    // Determine recommendation based on risk
-    let recommendation;
-    if (riskScore < 30) {
-      recommendation = 'APPROVE';
-    } else if (riskScore < 60) {
-      recommendation = 'REVIEW';
-    } else {
-      recommendation = 'DECLINE';
-    }
-
+    // Customer Type scoring
+    const customerTypeScore = calculateCustomerTypeScore(customerType);
+    creditScore += customerTypeScore;
+    
+    // Occupation stability scoring
+    const occupationScore = calculateOccupationScore(occupationProfile);
+    creditScore += occupationScore;
+    
+    // Financial profile scoring
+    const financialScore = calculateFinancialScore(financialProfile);
+    creditScore += financialScore;
+    
+    // Location context scoring
+    const locationScore = calculateLocationScore(locationContext);
+    creditScore += locationScore;
+    
+    // Normalize score to 300-850 range
+    creditScore = Math.max(300, Math.min(850, creditScore));
+    
+    // Determine risk level and recommendations
+    const riskLevel = calculateRiskLevel(creditScore);
+    const loanLimit = calculateLoanLimit(creditScore, financialProfile.averageMonthlyIncome);
+    const interestRate = calculateInterestRate(creditScore);
+    
     return {
-      riskScore: Math.round(riskScore),
-      recommendation,
-      confidence: confidence.toFixed(1),
-      suggestedLimit,
-      factors: generateFactors(occupationLower, riskScore)
+      creditScore: Math.round(creditScore),
+      riskLevel,
+      loanLimit,
+      interestRate,
+      recommendation: getRecommendation(riskLevel),
+      confidence: (85 + Math.random() * 10).toFixed(1),
+      factors: generateEnhancedRiskFactors(client, creditScore),
+      breakdown: {
+        customerTypeScore,
+        occupationScore: Math.round(occupationScore),
+        financialScore: Math.round(financialScore),
+        locationScore: Math.round(locationScore),
+        baseScore: 500
+      },
+      client: {
+        name: client.name,
+        customerType: client.customerType,
+        occupation: occupationProfile.primaryOccupation,
+        location: locationContext?.district || 'Unknown'
+      },
+      behavioralInsights: generateBehavioralInsights(client)
     };
   };
 
-  const generateFactors = (occupation, riskScore) => {
-    const factors = [];
+  const calculateCustomerTypeScore = (customerType) => {
+    const scores = {
+      'farmer': 80,
+      'market_vendor': 70,
+      'taxi_driver': 60,
+      'artisan': 65,
+      'shop_owner': 85,
+      'gig_worker': 55,
+      'small_business': 90,
+      'other': 50
+    };
     
-    if (occupation.includes('vendor') || occupation.includes('market')) {
-      factors.push('Stable daily income');
-      factors.push('Regular customer base');
-      factors.push('Low operational costs');
-    } else if (occupation.includes('farmer')) {
-      factors.push('Seasonal income pattern');
-      factors.push('Asset-backed potential');
-      factors.push('Market price dependent');
-    } else if (occupation.includes('teacher')) {
-      factors.push('Stable employment');
-      factors.push('Regular salary');
-      factors.push('Government employment');
-    }
-    
-    if (riskScore < 40) {
-      factors.push('High repayment capacity');
-      factors.push('Low default history');
-    } else if (riskScore > 70) {
-      factors.push('Income variability concern');
-      factors.push('Higher risk profile');
-    }
-    
-    return factors.slice(0, 3); // Return top 3 factors
+    return scores[customerType] || 50;
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !loading) {
-      handleAIAssessment();
+  const calculateOccupationScore = (occupationProfile) => {
+    let score = 0;
+    
+    // Years in occupation (max 100 points)
+    score += Math.min(100, occupationProfile.yearsInOccupation * 15);
+    
+    // Sector-specific factors
+    if (occupationProfile.sectorSpecific) {
+      if (occupationProfile.sectorSpecific.businessAge) {
+        score += Math.min(50, occupationProfile.sectorSpecific.businessAge * 8);
+      }
+      if (occupationProfile.sectorSpecific.farmingExperience) {
+        score += Math.min(50, occupationProfile.sectorSpecific.farmingExperience * 8);
+      }
     }
+    
+    return score;
+  };
+
+  const calculateFinancialScore = (financialProfile) => {
+    let score = 0;
+    
+    // Income scoring (max 150 points)
+    if (financialProfile.averageMonthlyIncome) {
+      score += Math.min(150, (financialProfile.averageMonthlyIncome / 1000000) * 150);
+    }
+    
+    // Mobile money usage scoring (max 100 points)
+    if (financialProfile.mobileMoneyUsage) {
+      const mm = financialProfile.mobileMoneyUsage;
+      
+      // Balance scoring
+      if (mm.averageBalance) {
+        score += Math.min(50, (mm.averageBalance / 500000) * 50);
+      }
+      
+      // Transaction frequency
+      const frequencyScores = {
+        'daily': 30,
+        'weekly': 25,
+        'monthly': 15,
+        'rarely': 5
+      };
+      score += frequencyScores[mm.transactionFrequency] || 10;
+    }
+    
+    return score;
+  };
+
+  const calculateLocationScore = (locationContext) => {
+    let score = 50; // Base location score
+    
+    if (locationContext) {
+      // Urban areas score higher
+      const urbanDistricts = ['Kampala', 'Entebbe', 'Jinja', 'Mbale'];
+      if (urbanDistricts.includes(locationContext.district)) {
+        score += 20;
+      }
+      
+      // Central region advantage
+      if (locationContext.region === 'Central') {
+        score += 15;
+      }
+    }
+    
+    return score;
+  };
+
+  const calculateRiskLevel = (score) => {
+    if (score >= 750) return 'Low Risk';
+    if (score >= 650) return 'Moderate Risk';
+    if (score >= 550) return 'Medium Risk';
+    return 'High Risk';
+  };
+
+  const calculateLoanLimit = (score, monthlyIncome) => {
+    const baseMultiplier = score / 850;
+    const income = monthlyIncome || 500000;
+    return Math.round(income * 12 * baseMultiplier * 2);
+  };
+
+  const calculateInterestRate = (score) => {
+    if (score >= 750) return 12.5;
+    if (score >= 650) return 16.8;
+    if (score >= 550) return 22.3;
+    return 28.9;
+  };
+
+  const getRecommendation = (riskLevel) => {
+    const recommendations = {
+      'Low Risk': 'APPROVE - Excellent candidate for lending',
+      'Moderate Risk': 'APPROVE - Good candidate with standard terms',
+      'Medium Risk': 'REVIEW - Requires additional verification',
+      'High Risk': 'DECLINE - High default risk detected'
+    };
+    return recommendations[riskLevel];
+  };
+
+  const generateEnhancedRiskFactors = (client, score) => {
+    const factors = [];
+    const { customerType, occupationProfile, financialProfile } = client;
+    
+    // Customer type factors
+    factors.push(`${customerType.replace('_', ' ').toUpperCase()} profile`);
+    
+    // Occupation factors
+    if (occupationProfile.yearsInOccupation > 5) {
+      factors.push('Established business history');
+    } else if (occupationProfile.yearsInOccupation < 2) {
+      factors.push('New business venture');
+    }
+    
+    // Financial factors
+    if (financialProfile.averageMonthlyIncome > 1000000) {
+      factors.push('Strong income capacity');
+    } else if (financialProfile.averageMonthlyIncome < 300000) {
+      factors.push('Limited income buffer');
+    }
+    
+    // Mobile money factors
+    if (financialProfile.mobileMoneyUsage) {
+      if (financialProfile.mobileMoneyUsage.transactionFrequency === 'daily') {
+        factors.push('Active mobile money user');
+      }
+      if (financialProfile.mobileMoneyUsage.averageBalance > 200000) {
+        factors.push('Good savings behavior');
+      }
+    }
+    
+    return factors.slice(0, 5);
+  };
+
+  const generateBehavioralInsights = (client) => {
+    const insights = [];
+    const { customerType, financialProfile } = client;
+    
+    if (customerType === 'farmer') {
+      insights.push('Seasonal income pattern detected');
+      insights.push('Agricultural risk factors considered');
+    }
+    
+    if (customerType === 'market_vendor') {
+      insights.push('Daily cash flow business');
+      insights.push('Customer-dependent income model');
+    }
+    
+    if (financialProfile.mobileMoneyUsage?.transactionFrequency === 'daily') {
+      insights.push('High digital transaction frequency');
+    }
+    
+    return insights;
   };
 
   const clearHistory = () => {
     setSearchHistory([]);
     localStorage.removeItem('aiAssessmentHistory');
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-UG', {
+      style: 'currency',
+      currency: 'UGX',
+      minimumFractionDigits: 0,
+    }).format(amount);
   };
 
   const formatDate = (timestamp) => {
@@ -182,16 +420,35 @@ const AIportal = () => {
     });
   };
 
+  const getCustomerTypeIcon = (customerType) => {
+    const icons = {
+      'farmer': '👨‍🌾',
+      'market_vendor': '🏪',
+      'taxi_driver': '🚗',
+      'artisan': '🛠️',
+      'shop_owner': '🏬',
+      'gig_worker': '💼',
+      'small_business': '📊',
+      'other': '👤'
+    };
+    return icons[customerType] || '👤';
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
+        {/* Enhanced Header */}
         <div className="text-center mb-8">
+          <div className="flex items-center justify-center mb-4">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-2xl">
+              <span className="text-2xl">🤖</span>
+            </div>
+          </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            AI Credit Assessment
+            Enhanced AI Credit Assessment
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Advanced machine learning analysis for accurate credit risk evaluation and loan recommendations
+            Advanced risk analysis using comprehensive client data from enhanced registration
           </p>
         </div>
 
@@ -200,44 +457,114 @@ const AIportal = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-5">
-                <h2 className="text-2xl font-bold text-white">Credit Assessment</h2>
-                <p className="text-blue-100">Get instant AI-powered credit evaluation</p>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">Enhanced Client Assessment</h2>
+                    <p className="text-blue-100">Using comprehensive informal sector data</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="bg-blue-500 text-white px-2 py-1 rounded text-sm">AI v2.0</span>
+                    <span className="bg-green-500 text-white px-2 py-1 rounded text-sm">Enhanced</span>
+                  </div>
+                </div>
               </div>
 
               <div className="p-6">
-                {/* Occupation Input */}
+                {/* Assessment Type Selector */}
                 <div className="mb-6">
                   <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    Occupation
+                    Assessment Type
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={occupation}
-                      onChange={(e) => {
-                        setOccupation(e.target.value);
-                        setError(null);
-                      }}
-                      onKeyPress={handleKeyPress}
-                      list="occupations"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      placeholder="Enter occupation (e.g., market_vendor, farmer, teacher)"
-                    />
-                    <datalist id="occupations">
-                      {commonOccupations.map(occupation => (
-                        <option key={occupation} value={occupation} />
-                      ))}
-                    </datalist>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      onClick={() => setAssessmentType('comprehensive')}
+                      className={`p-4 border-2 rounded-lg text-center transition-all ${
+                        assessmentType === 'comprehensive'
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="text-lg mb-1">📊</div>
+                      <div className="font-medium">Comprehensive</div>
+                      <div className="text-xs text-gray-600">Full data analysis</div>
+                    </button>
+                    <button
+                      onClick={() => setAssessmentType('quick')}
+                      className={`p-4 border-2 rounded-lg text-center transition-all ${
+                        assessmentType === 'quick'
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="text-lg mb-1">⚡</div>
+                      <div className="font-medium">Quick Assessment</div>
+                      <div className="text-xs text-gray-600">Basic risk check</div>
+                    </button>
                   </div>
+                </div>
+
+                {/* Client Selection */}
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Select Enhanced Client *
+                  </label>
+                  <select
+                    value={selectedClient}
+                    onChange={(e) => handleClientSelect(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  >
+                    <option value="">Choose an enhanced client...</option>
+                    {clients.map(client => (
+                      <option key={client.id} value={client.id}>
+                        {client.name} - {getCustomerTypeIcon(client.customerType)} {client.customerType.replace('_', ' ')} 
+                        ({client.occupationProfile.primaryOccupation})
+                      </option>
+                    ))}
+                  </select>
                   <p className="text-xs text-gray-500 mt-2">
-                    Common: market_vendor, farmer, teacher, shop_keeper, driver
+                    Clients registered with enhanced informal sector data
                   </p>
                 </div>
 
+                {/* Enhanced Client Details Preview */}
+                {clientDetails && (
+                  <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
+                      <span className="mr-2">{getCustomerTypeIcon(clientDetails.customerType)}</span>
+                      Enhanced Client Profile
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600">Customer Type:</span>
+                        <p className="font-medium capitalize">{clientDetails.customerType.replace('_', ' ')}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Primary Occupation:</span>
+                        <p className="font-medium">{clientDetails.occupationProfile.primaryOccupation}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Experience:</span>
+                        <p className="font-medium">{clientDetails.occupationProfile.yearsInOccupation} years</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Monthly Income:</span>
+                        <p className="font-medium">{formatCurrency(clientDetails.financialProfile.averageMonthlyIncome)}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-gray-600">Mobile Money:</span>
+                        <p className="font-medium capitalize">
+                          {clientDetails.financialProfile.mobileMoneyUsage?.primaryProvider} • 
+                          {clientDetails.financialProfile.mobileMoneyUsage?.transactionFrequency} transactions
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Error Message */}
                 {error && (
-                  <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-yellow-700 flex items-center">
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700 flex items-center">
                       <span className="mr-2">⚠️</span>
                       {error}
                     </p>
@@ -247,49 +574,52 @@ const AIportal = () => {
                 {/* Action Button */}
                 <button
                   onClick={handleAIAssessment}
-                  disabled={loading}
+                  disabled={loading || !selectedClient}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold text-lg"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                      🤖 AI Analyzing...
+                      🤖 AI Analyzing Enhanced Data...
                     </div>
                   ) : (
-                    'Start AI Assessment'
+                    `Run ${assessmentType === 'comprehensive' ? 'Comprehensive' : 'Quick'} AI Assessment`
                   )}
                 </button>
 
-                {/* Results */}
+                {/* Enhanced Results */}
                 {result && (
                   <div className={`mt-6 p-6 border-2 rounded-xl transition-all duration-300 ${
-                    result.recommendation === 'APPROVE' 
+                    result.riskLevel === 'Low Risk' 
                       ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200' 
-                      : result.recommendation === 'REVIEW' 
+                      : result.riskLevel === 'Moderate Risk'
+                      ? 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200'
+                      : result.riskLevel === 'Medium Risk'
                       ? 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200'
                       : 'bg-gradient-to-br from-red-50 to-pink-50 border-red-200'
                   }`}>
                     <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-bold text-gray-900">Assessment Result</h3>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">Enhanced Credit Assessment</h3>
+                        <p className="text-sm text-gray-600">
+                          For: {result.client.name} • {getCustomerTypeIcon(result.client.customerType)} 
+                          {result.client.customerType.replace('_', ' ')}
+                        </p>
+                      </div>
                       <div className="flex items-center space-x-2">
-                        {result.isMock && (
-                          <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-medium">
-                            Demo Data
-                          </span>
-                        )}
-                        {!result.isMock && (
-                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
-                            Real Data
-                          </span>
-                        )}
+                        <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">
+                          AI v2.0
+                        </span>
                         <span className={`text-xs px-2 py-1 rounded-full font-bold ${
-                          result.recommendation === 'APPROVE' 
+                          result.riskLevel === 'Low Risk' 
                             ? 'bg-green-100 text-green-800' 
-                            : result.recommendation === 'REVIEW' 
+                            : result.riskLevel === 'Moderate Risk'
+                            ? 'bg-blue-100 text-blue-800'
+                            : result.riskLevel === 'Medium Risk'
                             ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {result.recommendation}
+                          {result.riskLevel}
                         </span>
                       </div>
                     </div>
@@ -297,76 +627,85 @@ const AIportal = () => {
                     {/* Key Metrics Grid */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                       <div className="text-center p-3 bg-white rounded-lg shadow-sm">
-                        <div className="text-2xl font-bold text-gray-900">{result.riskScore}%</div>
-                        <div className="text-xs text-gray-500 font-medium">Risk Score</div>
+                        <div className="text-2xl font-bold text-gray-900">{result.creditScore}</div>
+                        <div className="text-xs text-gray-500 font-medium">Credit Score</div>
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                           <div 
                             className={`h-2 rounded-full transition-all duration-500 ${
-                              result.riskScore < 30 ? 'bg-green-500' : 
-                              result.riskScore < 70 ? 'bg-yellow-500' : 'bg-red-500'
+                              result.creditScore >= 750 ? 'bg-green-500' : 
+                              result.creditScore >= 650 ? 'bg-blue-500' : 
+                              result.creditScore >= 550 ? 'bg-yellow-500' : 'bg-red-500'
                             }`}
-                            style={{ width: `${result.riskScore}%` }}
+                            style={{ width: `${((result.creditScore - 300) / 550) * 100}%` }}
                           ></div>
                         </div>
                       </div>
 
                       <div className="text-center p-3 bg-white rounded-lg shadow-sm">
                         <div className={`text-2xl font-bold ${
-                          result.recommendation === 'APPROVE' ? 'text-green-600' : 
-                          result.recommendation === 'REVIEW' ? 'text-yellow-600' : 'text-red-600'
+                          result.riskLevel === 'Low Risk' ? 'text-green-600' : 
+                          result.riskLevel === 'Moderate Risk' ? 'text-blue-600' : 
+                          result.riskLevel === 'Medium Risk' ? 'text-yellow-600' : 'text-red-600'
                         }`}>
-                          {result.recommendation}
+                          {result.recommendation.split(' - ')[0]}
                         </div>
                         <div className="text-xs text-gray-500 font-medium">Decision</div>
                       </div>
 
                       <div className="text-center p-3 bg-white rounded-lg shadow-sm">
-                        <div className="text-2xl font-bold text-blue-600">{result.confidence}%</div>
-                        <div className="text-xs text-gray-500 font-medium">Confidence</div>
+                        <div className="text-2xl font-bold text-purple-600">
+                          {formatCurrency(result.loanLimit)}
+                        </div>
+                        <div className="text-xs text-gray-500 font-medium">Suggested Limit</div>
                       </div>
 
                       <div className="text-center p-3 bg-white rounded-lg shadow-sm">
-                        <div className="text-2xl font-bold text-purple-600">
-                          UGX {result.suggestedLimit.toLocaleString()}
-                        </div>
-                        <div className="text-xs text-gray-500 font-medium">Limit</div>
+                        <div className="text-2xl font-bold text-orange-600">{result.interestRate}%</div>
+                        <div className="text-xs text-gray-500 font-medium">Interest Rate</div>
                       </div>
                     </div>
 
-                    {/* Key Factors */}
-                    {result.factors && result.factors.length > 0 && (
-                      <div className="mt-4">
-                        <h4 className="font-semibold text-gray-700 mb-2">Key Factors:</h4>
+                    {/* Score Breakdown */}
+                    <div className="mb-4 p-3 bg-white rounded-lg">
+                      <h4 className="font-semibold text-gray-700 mb-2">Score Breakdown:</h4>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>Customer Type: +{result.breakdown.customerTypeScore}</div>
+                        <div>Occupation: +{result.breakdown.occupationScore}</div>
+                        <div>Financial: +{result.breakdown.financialScore}</div>
+                        <div>Location: +{result.breakdown.locationScore}</div>
+                      </div>
+                    </div>
+
+                    {/* Behavioral Insights */}
+                    {result.behavioralInsights && result.behavioralInsights.length > 0 && (
+                      <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-700 mb-2">Behavioral Insights:</h4>
                         <div className="flex flex-wrap gap-2">
-                          {result.factors.map((factor, index) => (
+                          {result.behavioralInsights.map((insight, index) => (
                             <span 
                               key={index}
                               className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
                             >
-                              {factor}
+                              {insight}
                             </span>
                           ))}
                         </div>
                       </div>
                     )}
 
-                    {/* Additional Breakdown (from real API) */}
-                    {result.breakdown && !result.isMock && (
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <h4 className="font-semibold text-gray-700 mb-2">Score Breakdown:</h4>
-                        <div className="grid grid-cols-3 gap-2 text-xs">
-                          <div className="text-center p-2 bg-gray-50 rounded">
-                            <div className="font-medium">Occupation</div>
-                            <div className="text-blue-600 font-bold">{result.breakdown.occupationRisk}%</div>
-                          </div>
-                          <div className="text-center p-2 bg-gray-50 rounded">
-                            <div className="font-medium">History</div>
-                            <div className="text-green-600 font-bold">{result.breakdown.historicalPerformance}%</div>
-                          </div>
-                          <div className="text-center p-2 bg-gray-50 rounded">
-                            <div className="font-medium">Economic</div>
-                            <div className="text-purple-600 font-bold">{result.breakdown.economicFactor}%</div>
-                          </div>
+                    {/* Risk Factors */}
+                    {result.factors && result.factors.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="font-semibold text-gray-700 mb-2">Key Risk Factors:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {result.factors.map((factor, index) => (
+                            <span 
+                              key={index}
+                              className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium"
+                            >
+                              {factor}
+                            </span>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -403,22 +742,27 @@ const AIportal = () => {
                       key={item.id}
                       className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer"
                       onClick={() => {
-                        setOccupation(item.occupation);
+                        handleClientSelect(item.clientId);
                         setResult(item.result);
                       }}
                     >
                       <div className="flex justify-between items-start">
-                        <span className="font-medium text-gray-800 text-sm">
-                          {item.occupation}
-                        </span>
+                        <div className="flex items-center space-x-2">
+                          <span>{getCustomerTypeIcon(item.result.client.customerType)}</span>
+                          <span className="font-medium text-gray-800 text-sm">
+                            {item.clientName}
+                          </span>
+                        </div>
                         <span className={`text-xs px-2 py-1 rounded-full font-bold ${
-                          item.result.recommendation === 'APPROVE' 
+                          item.result.riskLevel === 'Low Risk' 
                             ? 'bg-green-100 text-green-800' 
-                            : item.result.recommendation === 'REVIEW' 
+                            : item.result.riskLevel === 'Moderate Risk'
+                            ? 'bg-blue-100 text-blue-800'
+                            : item.result.riskLevel === 'Medium Risk'
                             ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {item.result.recommendation}
+                          {item.result.riskLevel.split(' ')[0]}
                         </span>
                       </div>
                       <div className="flex justify-between items-center mt-2">
@@ -426,46 +770,56 @@ const AIportal = () => {
                           {formatDate(item.timestamp)}
                         </span>
                         <span className="text-xs font-medium text-gray-700">
-                          {item.result.riskScore}% risk
+                          Score: {item.result.creditScore}
                         </span>
                       </div>
-                      {item.result.isMock && (
-                        <span className="text-xs text-yellow-600 mt-1">Demo</span>
-                      )}
-                      {!item.result.isMock && (
-                        <span className="text-xs text-green-600 mt-1">Real</span>
-                      )}
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Info Cards */}
+            {/* Enhanced How It Works */}
             <div className="bg-white rounded-2xl shadow-xl p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">How It Works</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Enhanced AI Assessment</h3>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
                   <div className="text-2xl">📊</div>
                   <div>
-                    <h4 className="font-semibold text-gray-800">Data Analysis</h4>
-                    <p className="text-sm text-gray-600">Analyzes occupation patterns and financial behavior</p>
+                    <h4 className="font-semibold text-gray-800">Comprehensive Data</h4>
+                    <p className="text-sm text-gray-600">Uses enhanced client profiles with sector-specific data</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="text-2xl">🤖</div>
                   <div>
-                    <h4 className="font-semibold text-gray-800">Machine Learning</h4>
-                    <p className="text-sm text-gray-600">Uses trained models to predict credit risk</p>
+                    <h4 className="font-semibold text-gray-800">Advanced Analysis</h4>
+                    <p className="text-sm text-gray-600">Analyzes occupation, financial behavior, and location data</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="text-2xl">🎯</div>
                   <div>
-                    <h4 className="font-semibold text-gray-800">Smart Scoring</h4>
-                    <p className="text-sm text-gray-600">Provides accurate risk assessment and recommendations</p>
+                    <h4 className="font-semibold text-gray-800">Sector-Specific</h4>
+                    <p className="text-sm text-gray-600">Tailored for farmers, vendors, gig workers, and artisans</p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+              <div className="space-y-3">
+                <Link
+                  to="/register"
+                  className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors text-center block font-medium"
+                >
+                  Register New Client
+                </Link>
+                <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                  Export Assessment Report
+                </button>
               </div>
             </div>
           </div>

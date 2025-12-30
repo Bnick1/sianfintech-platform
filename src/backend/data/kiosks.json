@@ -1,0 +1,12 @@
+[
+  {
+    "id": "4001",
+    "location": "Kampala Branch",
+    "status": "Online"
+  },
+  {
+    "id": "4002",
+    "location": "Entebbe Branch",
+    "status": "Offline"
+  }
+]

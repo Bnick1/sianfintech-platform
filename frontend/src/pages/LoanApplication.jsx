@@ -1,267 +1,250 @@
 import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const LoanApplication = () => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
-    userId: '',
-    amount: '',
-    termMonths: '6',
-    purpose: 'business_expansion',
-    occupation: '',
-    businessType: '',
-    location: '',
-    existingLoans: 'no'
+    loanAmount: '',
+    loanPeriod: '12',
+    loanPurpose: '',
+    repaymentSource: ''
   });
-
-  const [aiResult, setAiResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleAIAssessment = async () => {
-    if (!formData.occupation || !formData.amount) {
-      alert('Please fill occupation and amount first');
-      return;
-    }
+  const loanPurposes = [
+    'Agricultural Inputs',
+    'Business Expansion',
+    'Equipment Purchase',
+    'Working Capital',
+    'Education Fees',
+    'Medical Expenses',
+    'Home Improvement',
+    'Vehicle Purchase',
+    'Other'
+  ];
 
-    setLoading(true);
-    try {
-      const response = await fetch('http://localhost:8082/ai/predict', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          occupation: formData.occupation,
-          businessType: formData.businessType,
-          location: formData.location,
-          monthlyVolume: formData.amount * 3
-        })
-      });
-      
-      const data = await response.json();
-      setAiResult(data);
-    } catch (error) {
-      console.error('AI Assessment error:', error);
-      alert('AI Assessment failed: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const repaymentSources = [
+    'Business Revenue',
+    'Salary/Employment',
+    'Farm Produce Sales',
+    'Investment Returns',
+    'Other Income'
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
-      const response = await fetch('http://localhost:8082/loans/apply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: formData.userId,
-          amount: parseInt(formData.amount),
-          termMonths: parseInt(formData.termMonths),
-          purpose: formData.purpose
-        })
-      });
+      // Simulate API call to submit loan application
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const data = await response.json();
-      if (response.ok) {
-        setSubmitted(true);
-        alert('✅ Loan application submitted successfully!');
-      } else {
-        alert('❌ Loan application failed: ' + data.message);
-      }
+      console.log('Loan application submitted:', {
+        ...formData,
+        memberId: user.memberNumber,
+        applicantName: user.name,
+        phoneNumber: user.phoneNumber,
+        occupation: user.occupation,
+        timestamp: new Date().toISOString()
+      });
+
+      setSubmitted(true);
     } catch (error) {
-      alert('❌ Loan application failed: ' + error.message);
+      console.error('Error submitting loan application:', error);
+      alert('Failed to submit application. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
+  const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [field]: value
     }));
   };
 
   if (submitted) {
     return (
-      <div className="max-w-2xl mx-auto p-6 text-center">
-        <div className="text-4xl mb-4">✅</div>
-        <h1 className="text-2xl font-bold text-green-600 mb-4">Loan Application Submitted!</h1>
-        <p className="text-gray-600 mb-6">Your loan application has been received and is under review.</p>
-        <button 
-          onClick={() => setSubmitted(false)}
-          className="bg-blue-600 text-white px-6 py-2 rounded"
-        >
-          Apply for Another Loan
-        </button>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="text-green-500 text-6xl mb-4">✅</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Application Submitted!</h2>
+          <p className="text-gray-600 mb-6">
+            Your loan application has been received and is under review by our team.
+            You will be notified via SMS once a decision is made.
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+            <h3 className="font-semibold text-blue-900 mb-2">Next Steps:</h3>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• Application received by GLDMF staff</li>
+              <li>• AI credit assessment in progress</li>
+              <li>• Manual review by loan officer</li>
+              <li>• Decision within 2-3 business days</li>
+            </ul>
+          </div>
+          <button
+            onClick={() => window.location.href = '/member/dashboard'}
+            className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
+          >
+            Back to Dashboard
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-2">Loan Application</h1>
-      <p className="text-gray-600 text-center mb-8">AI-powered loan assessment</p>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Loan Application</h1>
+            <p className="text-gray-600">Apply for financing to grow your business or meet personal needs</p>
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Loan Form */}
-        <div className="lg:col-span-2">
-          <div className="card">
-            <h2 className="text-xl font-semibold mb-4">Loan Details</h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Applicant Info (Read-only from system) */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-blue-900 mb-3">Applicant Information</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <label className="block text-sm font-medium mb-2">User ID *</label>
+                <p className="text-blue-700">Name</p>
+                <p className="font-semibold">{user.name}</p>
+              </div>
+              <div>
+                <p className="text-blue-700">Member ID</p>
+                <p className="font-semibold">{user.memberNumber}</p>
+              </div>
+              <div>
+                <p className="text-blue-700">Phone</p>
+                <p className="font-semibold">{user.phoneNumber}</p>
+              </div>
+              <div>
+                <p className="text-blue-700">Occupation</p>
+                <p className="font-semibold capitalize">{user.occupation}</p>
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Loan Amount */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Loan Amount (UGX) *
+              </label>
+              <input
+                type="number"
+                required
+                value={formData.loanAmount}
+                onChange={(e) => handleInputChange('loanAmount', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter desired loan amount"
+                min="100000"
+              />
+              <p className="text-xs text-gray-500 mt-1">Minimum loan amount: UGX 100,000</p>
+            </div>
+
+            {/* Loan Period */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Loan Period (Months) *
+              </label>
+              <select
+                required
+                value={formData.loanPeriod}
+                onChange={(e) => handleInputChange('loanPeriod', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="6">6 Months</option>
+                <option value="12">12 Months</option>
+                <option value="18">18 Months</option>
+                <option value="24">24 Months</option>
+                <option value="36">36 Months</option>
+              </select>
+            </div>
+
+            {/* Loan Purpose */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Loan Purpose *
+              </label>
+              <select
+                required
+                value={formData.loanPurpose}
+                onChange={(e) => handleInputChange('loanPurpose', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select purpose</option>
+                {loanPurposes.map(purpose => (
+                  <option key={purpose} value={purpose}>{purpose}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Repayment Source */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Primary Repayment Source *
+              </label>
+              <select
+                required
+                value={formData.repaymentSource}
+                onChange={(e) => handleInputChange('repaymentSource', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select source</option>
+                {repaymentSources.map(source => (
+                  <option key={source} value={source}>{source}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Additional Details */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Additional Information (Optional)
+              </label>
+              <textarea
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Provide any additional details about your loan request..."
+              />
+            </div>
+
+            {/* Terms Agreement */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-start">
                 <input
-                  type="text"
-                  name="userId"
-                  value={formData.userId}
-                  onChange={handleChange}
+                  type="checkbox"
                   required
-                  className="w-full p-2 border border-gray-300 rounded"
-                  placeholder="Paste User ID from registration"
+                  className="mt-1 mr-3"
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Loan Amount (UGX) *</label>
-                  <input
-                    type="number"
-                    name="amount"
-                    value={formData.amount}
-                    onChange={handleChange}
-                    required
-                    min="50000"
-                    className="w-full p-2 border border-gray-300 rounded"
-                    placeholder="500000"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Occupation *</label>
-                  <input
-                    type="text"
-                    name="occupation"
-                    value={formData.occupation}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border border-gray-300 rounded"
-                    placeholder="market_vendor"
-                  />
+                  <p className="text-sm text-yellow-800">
+                    I agree to the terms and conditions. I understand that this application 
+                    will be assessed by GLDMF staff and approval is subject to credit assessment. 
+                    If approved, funds will be disbursed via mobile money.
+                  </p>
                 </div>
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Business Type</label>
-                  <input
-                    type="text"
-                    name="businessType"
-                    value={formData.businessType}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded"
-                    placeholder="retail"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Location</label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded"
-                    placeholder="kampala"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Loan Term (Months) *</label>
-                  <select
-                    name="termMonths"
-                    value={formData.termMonths}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border border-gray-300 rounded"
-                  >
-                    <option value="3">3 Months</option>
-                    <option value="6">6 Months</option>
-                    <option value="12">12 Months</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Loan Purpose *</label>
-                  <select
-                    name="purpose"
-                    value={formData.purpose}
-                    onChange={handleChange}
-                    required
-                    className="w-full p-2 border border-gray-300 rounded"
-                  >
-                    <option value="business_expansion">Business Expansion</option>
-                    <option value="inventory">Inventory</option>
-                    <option value="equipment">Equipment</option>
-                    <option value="emergency">Emergency</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <button
-                  type="button"
-                  onClick={handleAIAssessment}
-                  disabled={loading || !formData.occupation || !formData.amount}
-                  className="bg-gray-600 text-white px-4 py-2 rounded disabled:bg-gray-400"
-                >
-                  {loading ? 'Assessing...' : '🤖 AI Assessment'}
-                </button>
-                
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-blue-600 text-white px-6 py-2 rounded disabled:bg-gray-400 ml-auto"
-                >
-                  {loading ? 'Submitting...' : 'Apply for Loan'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        {/* AI Results */}
-        <div className="lg:col-span-1">
-          <div className="card">
-            <h3 className="text-lg font-semibold mb-4">AI Assessment</h3>
-            
-            {aiResult ? (
-              <div className="space-y-3">
-                <div className="bg-blue-50 p-3 rounded">
-                  <div className="text-2xl font-bold text-blue-600">{aiResult.prediction.riskScore}%</div>
-                  <div className="text-sm text-blue-700">Risk Score</div>
-                </div>
-
-                <div>
-                  <div className="font-medium">Recommendation:</div>
-                  <div className="text-green-600 font-semibold">{aiResult.prediction.recommendation}</div>
-                </div>
-
-                <div>
-                  <div className="font-medium">Max Loan:</div>
-                  <div className="font-semibold">UGX {aiResult.prediction.maxLoanAmount?.toLocaleString()}</div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-8">
-                <div className="text-3xl mb-2">🤖</div>
-                <p>Complete AI assessment to see results</p>
-              </div>
-            )}
-          </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 flex items-center justify-center"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Submitting Application...
+                </>
+              ) : (
+                'Submit Loan Application'
+              )}
+            </button>
+          </form>
         </div>
       </div>
     </div>

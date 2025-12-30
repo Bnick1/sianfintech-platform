@@ -1,14 +1,25 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+  ],
   build: {
     outDir: 'dist',
     assetsDir: 'assets'
   },
-  base: '/', // Ensure this is set to root
+  base: '/',
   server: {
-    port: 3000
+    port: 5173,
+    host: true,
+    open: true
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom']
+  },
+  css: {
+    postcss: './postcss.config.js'
   }
 })

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1001",
+    "name": "Alice Johnson",
+    "email": "alice@example.com",
+    "phone": "+256700123456"
+  },
+  {
+    "id": "1002",
+    "name": "Bob Smith",
+    "email": "bob@example.com",
+    "phone": "+256700654321"
+  },
+  {
+    "id": "1761502230680",
+    "name": "Nickson",
+    "email": "nick@siantech.ai",
+    "phone": "+256700123456"
+  },
+  {
+    "id": "1761503581061",
+    "name": "Nickson",
+    "email": "nick@siantech.ai",
+    "phone": "+256700123456"
+  },
+  {
+    "id": "1761507203319",
+    "name": "Nickson",
+    "email": "nick@siantech.ai",
+    "phone": "+256700123456"
+  },
+  {
+    "id": "1761508636234",
+    "name": "Nickson",
+    "email": "nick@siantech.ai",
+    "phone": "+256700123456"
+  },
+  {
+    "id": "1761515774664",
+    "name": "Nickson",
+    "email": "nick@siantech.ai",
+    "phone": "+256700123456"
+  },
+  {
+    "id": "1761516290224",
+    "name": "Nickson",
+    "email": "nick@siantech.ai",
+    "phone": "+256700123456"
+  },
+  {
+    "id": "1761553287237",
+    "name": "Nickson",
+    "email": "nick@siantech.ai",
+    "phone": "+256700123456"
+  },
+  {
+    "id": "1761554231836",
+    "name": "Nickson",
+    "email": "nick@siantech.ai",
+    "phone": "+256700123456"
+  }
+]

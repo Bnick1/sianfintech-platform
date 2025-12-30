@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://sianfintech-backend.vercel.app';
+const API_BASE_URL = 'https://sianfintech-api.vercel.app';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -35,7 +35,7 @@ export const loanService = {
 
 export const checkBackendHealth = async () => {
   try {
-    const response = await api.get('/health');
+    const response = await api.get('/api/health');
     return response.status === 200;
   } catch (error) {
     console.error('Backend health check failed:', error);

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "2001",
+    "userId": "1001",
+    "amount": 5000,
+    "status": "Approved",
+    "termMonths": 6
+  },
+  {
+    "id": "2002",
+    "userId": "1002",
+    "amount": 10000,
+    "status": "Pending",
+    "termMonths": 12
+  }
+]
