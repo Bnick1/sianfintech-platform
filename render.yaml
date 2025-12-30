@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: sianfintech-gldmf-production
+    env: node
+    region: us-east
+    plan: starter
+    rootDirectory: backend  # ← CRITICAL: This tells Render where your code is
+    buildCommand: npm install --production
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+    disk:
+      name: logs
+      mountPath: /opt/render/logs
+      sizeGB: 1
