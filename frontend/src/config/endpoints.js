@@ -6,8 +6,8 @@ const getApiBaseUrl = () => {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return 'http://localhost:8082';
   }
-  // For production - use your actual domain
-  return 'https://your-production-domain.com';
+  // For production - use your Render backend
+  return 'https://sianfintech-platform.onrender.com';
 };
 
 export const API_CONFIG = {

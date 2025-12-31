@@ -1,5 +1,5 @@
 // src/services/apiService.js
-const API_BASE_URL = 'http://localhost:8082/api';
+const API_BASE_URL = 'https://sianfintech-platform.onrender.com/api';
 
 // Generic API call function with better error handling
 export async function apiCall(endpoint, options = {}) {
@@ -176,7 +176,7 @@ export const investmentsAPI = {
 // Dashboard API
 export const dashboardAPI = {
   getGLDMFDashboard: (tenantCode = 'GLDMF') => {
-    return apiCall(`/dashboard/gldmf/${tenantCode}`);
+    return apiCall(`/dashboard/gldmf/${tenantCode.toLowerCase()}`);
   },
   
   getSianDashboard: () => {
@@ -220,7 +220,7 @@ export const tenantsAPI = {
 // System API
 export const systemAPI = {
   getHealth: () => {
-    return apiCall('/system/health');
+    return apiCall('/health');
   },
   
   getMetrics: () => {

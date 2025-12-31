@@ -1,25 +1,46 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
   build: {
     outDir: 'dist',
-    assetsDir: 'assets'
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
+    },
+    chunkSizeWarningLimit: 1000
   },
-  base: '/',
   server: {
     port: 5173,
     host: true,
-    open: true
+    open: true,
+    proxy: {
+      '/api': {
+        target: 'https://sianfintech-platform.onrender.com',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path
+      }
+    }
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src')
+    }
+  },
+  base: '/',  // Keep as '/' for Vercel
+  css: {
+    devSourcemap: false,
+    postcss: './postcss.config.js'
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom']
-  },
-  css: {
-    postcss: './postcss.config.js'
+    include: ['react', 'react-dom', 'react-router-dom'],
+    exclude: []
   }
 })
