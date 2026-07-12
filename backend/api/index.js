@@ -1,14 +1,11 @@
 ﻿import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['https://sian-trader-app.vercel.app', 'http://localhost:8081', 'http://localhost:3000'],
+  origin: '*',
   credentials: true
 }));
 app.use(express.json());
@@ -18,8 +15,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    version: '1.0.0',
-    env: process.env.NODE_ENV || 'development'
+    version: '1.0.0'
   });
 });
 
@@ -45,7 +41,7 @@ app.post('/api/auth/mock-login', (req, res) => {
   }
 });
 
-// Trading status endpoint (mock)
+// Trading status endpoint
 app.get('/api/trading/status', (req, res) => {
   res.json({
     success: true,
@@ -64,7 +60,7 @@ app.get('/api/trading/status', (req, res) => {
   });
 });
 
-// Portfolio endpoint (mock)
+// Portfolio endpoint
 app.get('/api/portfolio', (req, res) => {
   res.json({
     success: true,
@@ -86,6 +82,41 @@ app.get('/api/portfolio', (req, res) => {
       monthlyProjection: 0,
       profitPerHour: 0
     }
+  });
+});
+
+// AI insights endpoint
+app.get('/api/ai/insights', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      strategyWeights: {
+        trendFollowing: 0.25,
+        meanReversion: 0.25,
+        breakout: 0.25,
+        arbitrage: 0.25
+      },
+      parameters: {},
+      confidence: 'LEARNING',
+      memorySize: 0,
+      iterations: 0,
+      learningRate: 0.001
+    }
+  });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: 'SIAN Trading API',
+    version: '1.0.0',
+    endpoints: [
+      '/api/health',
+      '/api/auth/mock-login',
+      '/api/trading/status',
+      '/api/portfolio',
+      '/api/ai/insights'
+    ]
   });
 });
 
