@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import cors from 'cors';
 
 const app = express();
@@ -102,4 +102,7 @@ app.get('/', (req, res) => {
   });
 });
 
-export default app;
+// Vercel serverless handler
+export default async function handler(req, res) {
+  return app(req, res);
+}
