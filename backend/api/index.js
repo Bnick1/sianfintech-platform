@@ -102,7 +102,6 @@ app.get('/', (req, res) => {
   });
 });
 
-// Vercel serverless handler
 export default async function handler(req, res) {
   return app(req, res);
 }
