@@ -44,7 +44,7 @@ app.get('/api/trading/status', (req, res) => {
   });
 });
 
-// Portfolio
+// Portfolio - THIS IS THE KEY ENDPOINT
 app.get('/api/portfolio', (req, res) => {
   res.json({
     success: true,
@@ -102,6 +102,7 @@ app.get('/', (req, res) => {
   });
 });
 
+// Vercel serverless handler
 export default async function handler(req, res) {
   return app(req, res);
 }
