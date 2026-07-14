@@ -1,6 +1,5 @@
 ﻿import express from 'express';
 import cors from 'cors';
-import mongoose from 'mongoose';
 
 const app = express();
 
@@ -107,6 +106,6 @@ app.get('/', (req, res) => {
   });
 });
 
-// ============ VERCELL HANDLER ============
-// This is the key export that Vercel needs
-module.exports = app;
+// ============ VERCELL HANDLER - ES Module Export ============
+// This is the correct export for ES modules
+export default app;
