@@ -14,23 +14,41 @@ const app = express();
 // ============ MONGODB CONNECTION ============
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://nkiremire9_db_user:MutesiMeghan%4098@cluster0.ksslca9.mongodb.net/sian-fintech?retryWrites=true&w=majority';
 
-// Connect to MongoDB with options
-mongoose.connect(MONGODB_URI, {
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
-  family: 4 // Use IPv4, skip trying IPv6
-})
-.then(() => console.log('✅ MongoDB connected successfully'))
-.catch(err => console.error('❌ MongoDB connection error:', err.message));
+// Connection state
+let isConnected = false;
+let connectionPromise = null;
 
-// Handle connection events
-mongoose.connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
-});
+async function connectToDatabase() {
+  if (isConnected) {
+    return;
+  }
 
-mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB disconnected');
-});
+  // If connection is already in progress, wait for it
+  if (connectionPromise) {
+    return connectionPromise;
+  }
+
+  connectionPromise = mongoose.connect(MONGODB_URI, {
+    serverSelectionTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
+    family: 4,
+  })
+  .then(() => {
+    isConnected = true;
+    connectionPromise = null;
+    console.log('✅ MongoDB connected successfully');
+  })
+  .catch((err) => {
+    connectionPromise = null;
+    console.error('❌ MongoDB connection error:', err.message);
+    throw err;
+  });
+
+  return connectionPromise;
+}
+
+// Start connection immediately
+connectToDatabase().catch(console.error);
 
 // ============ MIDDLEWARE ============
 app.use(cors({ 
@@ -38,6 +56,20 @@ app.use(cors({
   credentials: true 
 }));
 app.use(express.json());
+
+// Database connection middleware - ensures DB is connected before handling requests
+app.use(async (req, res, next) => {
+  try {
+    await connectToDatabase();
+    next();
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      error: 'Database connection failed',
+      details: error.message 
+    });
+  }
+});
 
 // ============ HEALTH CHECK ============
 app.get('/api/health', (req, res) => {
@@ -48,7 +80,8 @@ app.get('/api/health', (req, res) => {
     status: 'healthy', 
     timestamp: new Date().toISOString(),
     version: '2.0.0',
-    database: states[dbState] || 'unknown'
+    database: states[dbState] || 'unknown',
+    isConnected: isConnected
   });
 });
 
@@ -80,7 +113,6 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
     
-    // Validation
     if (!name || !email || !phone || !password) {
       return res.status(400).json({ 
         success: false, 
@@ -88,13 +120,7 @@ app.post('/api/auth/register', async (req, res) => {
       });
     }
     
-    // Check if user exists (simplified for demo)
-    // In production, check against database
-    
-    // Create user and wallet
     const userId = 'user-' + Date.now();
-    
-    // Initialize wallet
     const wallet = await walletService.getOrCreateFiatWallet(userId);
     
     res.json({
@@ -270,13 +296,11 @@ app.post('/api/trade', async (req, res) => {
     const { action, symbol, size } = req.body;
     const userId = req.query.userId || 'default';
     
-    // Check wallet balance
     const balance = await walletService.getFiatBalance(userId);
     if (!balance.success) {
       throw new Error('Could not verify wallet balance');
     }
     
-    // Simulate trade execution
     const price = 50000 + (Math.random() - 0.5) * 100;
     const positionValue = size * price;
     
@@ -284,7 +308,6 @@ app.post('/api/trade', async (req, res) => {
       throw new Error(`Insufficient balance. Available: $${balance.balanceUSD.toFixed(2)}`);
     }
     
-    // Record trade
     const trade = {
       id: `TRD-${Date.now()}`,
       action,
