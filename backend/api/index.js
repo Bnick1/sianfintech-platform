@@ -6,9 +6,31 @@
 
 import express from 'express';
 import cors from 'cors';
+import mongoose from 'mongoose';
 import walletService from '../services/walletService.js';
 
 const app = express();
+
+// ============ MONGODB CONNECTION ============
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://nkiremire9_db_user:MutesiMeghan%4098@cluster0.ksslca9.mongodb.net/sian-fintech?retryWrites=true&w=majority';
+
+// Connect to MongoDB with options
+mongoose.connect(MONGODB_URI, {
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  family: 4 // Use IPv4, skip trying IPv6
+})
+.then(() => console.log('✅ MongoDB connected successfully'))
+.catch(err => console.error('❌ MongoDB connection error:', err.message));
+
+// Handle connection events
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected');
+});
 
 // ============ MIDDLEWARE ============
 app.use(cors({ 
@@ -19,10 +41,14 @@ app.use(express.json());
 
 // ============ HEALTH CHECK ============
 app.get('/api/health', (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+  
   res.json({ 
     status: 'healthy', 
     timestamp: new Date().toISOString(),
-    version: '2.0.0'
+    version: '2.0.0',
+    database: states[dbState] || 'unknown'
   });
 });
 
