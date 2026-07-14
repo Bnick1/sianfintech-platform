@@ -1,12 +1,18 @@
 {
   "name": "sian-api",
   "version": "1.0.0",
+  "type": "module",
   "main": "api/index.js",
   "scripts": {
-    "start": "node api/index.js"
+    "start": "node api/index.js",
+    "vercel-build": "npm install"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "mongoose": "^7.0.0",
+    "dotenv": "^16.3.1",
+    "axios": "^1.4.0",
+    "crypto-js": "^4.1.1"
   }
 }
